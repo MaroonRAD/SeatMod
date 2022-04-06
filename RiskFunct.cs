@@ -1,7 +1,5 @@
 ﻿using System;
-using MelonLoader;
 using UnityEngine;
-using UnityEngine.Networking;
 using VRC.Core;
 using SIDictionary = System.Collections.Generic.Dictionary<string, int>;
 
@@ -22,17 +20,18 @@ namespace SeatMod
         //10: Not checked yet.
         //11: Allowed: Private Instance
 
+        // ^ Old. New:
+        // 0: Unblocked
+        // 1: Blocked
+        // Simple as that.
+
         public static string WorldType()
         {
             switch (Main.WorldType)
             {
                 case 0: return "World Allowed";
-                case 1: return "Club World";
-                case 2: return "Game World";
-                case 3: return "EmmVRC DB Blacklisted";
-                case 4: return "GameObject Blacklisted";
+                case 1: return "World Not Allowed";
                 case 10: return "Not checked yet - Error?";
-                case 11: return "Private Instance: Mod Allowed";
                 default: Main.Logger.Error($"Something Broke - Main.WorldType Switch - {Main.WorldType}"); return "Error";
             }
         }
@@ -56,12 +55,10 @@ namespace SeatMod
             //Main.Logger.Msg($"Checking World with Id {worldId}");
 
             // Check if instance is private
-            if (RoomManager.field_Internal_Static_ApiWorldInstance_0?.type == InstanceAccessType.InvitePlus ||
-                RoomManager.field_Internal_Static_ApiWorldInstance_0?.type == InstanceAccessType.InviteOnly ||
-                RoomManager.field_Internal_Static_ApiWorldInstance_0?.type == InstanceAccessType.FriendsOnly)
+            if (RoomManager.field_Internal_Static_ApiWorldInstance_0?.type != InstanceAccessType.Public)
             {
                 //Main.Logger.Msg($"Instance is private: '{RoomManager.field_Internal_Static_ApiWorldInstance_0?.type}'");
-                Main.WorldType = 11;
+                Main.WorldType = 0;
                 //Do not cache result
                 yield break;
             }
@@ -83,42 +80,15 @@ namespace SeatMod
             }
             else if (GameObject.Find("eVRCRiskFuncDisable") != null || GameObject.Find("UniversalRiskyFuncDisable") != null || GameObject.Find("ModCompatRiskyFuncDisable ") != null)
             {
-                Main.WorldType = 4;
-                checkedWorlds.Add(worldId, 4);
+                Main.WorldType = 1;
+                checkedWorlds.Add(worldId, 1);
                 yield break;
             }
 
             alreadyCheckingWorld = true;
-            // Check if black/whitelisted from EmmVRC - thanks Emilia and the rest of EmmVRC Staff
-            var uwr = UnityWebRequest.Get($"https://dl.emmvrc.com/riskyfuncs.php?worldid={worldId}");
-            uwr.SendWebRequest();
-            while (!uwr.isDone)
-                yield return new WaitForEndOfFrame();
 
-            var result = uwr.downloadHandler.text?.Trim().ToLower();
-            uwr.Dispose();
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                switch (result)
-                {
-                    case "allowed":
-                        Main.WorldType = 0;
-                        checkedWorlds.Add(worldId, 0);
-                        alreadyCheckingWorld = false;
-                        //Main.Logger.Msg($"EmmVRC allows world '{worldId}'");
-                        yield break;
-
-                    case "denied":
-                        Main.WorldType = 3;
-                        checkedWorlds.Add(worldId, 3);
-                        alreadyCheckingWorld = false;
-                        //Main.Logger.Msg($"EmmVRC denies world '{worldId}'");
-                        yield break;
-                }
-            }
-
-            // No result from server or they're currently down
-            // Check tags then. should also be in cache as it just got downloaded
+            // No emm checks here!
+            // Check tags. should also be in cache as it just got downloaded
             API.Fetch<ApiWorld>(
                 worldId,
                 new Action<ApiContainer>(
@@ -132,7 +102,7 @@ namespace SeatMod
                             {
                                 if (worldTag.IndexOf("game", StringComparison.OrdinalIgnoreCase) != -1 && worldTag.IndexOf("games", StringComparison.OrdinalIgnoreCase) == -1)
                                 {
-                                    tagResult = 2;
+                                    tagResult = 1;
                                     //Main.Logger.Msg($"Found game tag in world world '{worldId}'");
                                     break;
                                 }

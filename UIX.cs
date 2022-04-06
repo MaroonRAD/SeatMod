@@ -88,17 +88,10 @@ namespace SeatMod
             blacklist.AddLabel($"Reason: {RiskFunct.WorldType()}");
             blacklist.AddSimpleButton("Close", () => blacklist.Hide());
 
-            var noSit = ExpansionKitApi.CreateCustomQuickMenuPage(LayoutDescriptionCustom.QuickMenu1Column4Butt);
-            noSit.AddLabel($"This user currently does not allow use of this mod");
-            noSit.AddLabel($"(Is DND or has a blacklisted status)");
-            noSit.AddSimpleButton("Close", () => noSit.Hide());
-
-            if ((Main.WorldType == 1 || Main.WorldType == 2 || Main.WorldType == 3 || Main.WorldType == 4 || Main.WorldType == 10)) 
+            if (Main.WorldType == 1 || Main.WorldType == 10) 
                 blacklist.Show();
-            else if (Utils.CanSit(Utils.GetSelectedUser()) == 1) //Ensure someone has the right to sit
+            else if (Main.WorldType == 0)
                 sitOnMenu.Show();
-            else if (Utils.CanSit(Utils.GetSelectedUser()) == 3) 
-                noSit.Show();
             else AddKeyWarning.Show();  
         }
 

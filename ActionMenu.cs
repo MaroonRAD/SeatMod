@@ -112,9 +112,11 @@ namespace SeatMod
 
         public static void InitUi()
         {
-            loadAssets();
+            //loadAssets();
             InitTextures();
-            LoadEmbeddedImages();
+            //LoadEmbeddedImages();
+
+            // Icon files aren't in the source. Having this stuff run breaks everything.
 
             if (Main.amapi_ModsFolder.Value)
                 AMUtils.AddToModsFolder("<color=#ff00ff>Seat Mod</color>", () => AMsubMenu(), chair);

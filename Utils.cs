@@ -33,24 +33,12 @@ namespace SeatMod
             set => Utils.CurrentUser = Utils.CurrentUser;
         }
 
-        /// <returns>Returns 3 if blacklisted status/busy, 1 if allowed, else 0</returns>
+        /// <returns>Returns 1. Used to return 3 if blacklisted status/busy, 1 if allowed, else 0, but why do that if you can just return 1?</returns>
+        ///
         public static int CanSit(Player player)
         {
-            string bio = player.prop_APIUser_0.bio.ToLower();
-            string status = player.prop_APIUser_0.statusDescription.ToLower();
-            string statusType = player.prop_APIUser_0.status;
-            //Main.Logger.Msg(bio);
-            //Main.Logger.Msg(status);
-            if(statusType == "busy" || status.Contains("nosit"))
-                return 3;
-
-            if (bio.Contains(Main.privateKey.ToString()) || status.Contains(Main.privateKey.ToString()) ||
-                bio.Contains("siton") || status.Contains("siton") ||
-                bio.Contains("sit with me") || status.Contains("sit with me") ||
-                bio.Contains("seats together") || status.Contains("seats together")
-                )
-                return 1;
-            else return 0;
+            return 1;
+            // one
         }
         public static string RandomString(int length)
         {

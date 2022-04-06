@@ -8,8 +8,9 @@ using System.Collections;
 using VRC.SDKBase;
 using VRC.Animation;
 using System.IO;
+using VRChatUtilityKit.Utilities;
 
-[assembly: MelonInfo(typeof(SeatMod.Main), "SeatMod", "1.0.4", "Nirvash")]
+[assembly: MelonInfo(typeof(SeatMod.Main), "SeatMod Client Client 2: Final Seatdown", "1.0.4", "Nirvash + Maroon#9378")]
 [assembly: MelonGame("VRChat", "VRChat")]
 [assembly: MelonColor(ConsoleColor.DarkBlue)]
 [assembly: MelonOptionalDependencies("ActionMenuApi")]
@@ -34,7 +35,7 @@ namespace SeatMod
         private static Transform cameraTransform = null;
         private static Quaternion originalRotation;
         public static VRCPlayerApi _vpalocal;
-        public static int WorldType = 10;
+        public static int WorldType = 0;
         public static VRCMotionState playerMotion;
         public static string privateKey;
 
@@ -70,6 +71,8 @@ namespace SeatMod
 
         public static MelonPreferences_Entry<bool> spacer1;
         public static MelonPreferences_Entry<bool> testing;
+
+        internal static bool riskyAllowed = true;
 
         public override void OnApplicationStart()
         {
@@ -114,7 +117,9 @@ namespace SeatMod
             ExpansionKitApi.RegisterWaitConditionBeforeDecorating(UIX.SetupUI());
             ExpansionKitApi.OnUiManagerInit += UiManagerInit;
 
-            loadAssets();
+            VRCUtils.OnEmmWorldCheckCompleted += OnEmmWorldCheckCompleted;
+
+            //loadAssets();
 
             if (MelonHandler.Mods.Any(m => m.Info.Name == "ActionMenuApi") && amapi_en.Value)
             {
@@ -122,6 +127,17 @@ namespace SeatMod
             }
             else Logger.Msg("ActionMenuApi is missing, or setting is toggled off in Mod Settings - Not adding controls to ActionMenu");
             MelonCoroutines.Start(OnLoad());
+        }
+
+        private void OnEmmWorldCheckCompleted(bool areRiskyFuncsAllowed)
+        {
+            riskyAllowed = areRiskyFuncsAllowed;
+            if (riskyAllowed == true)
+            {
+                WorldType = 0;
+            } else {
+                WorldType = 1;
+            }
         }
 
         public static IEnumerator OnLoad()
@@ -134,7 +150,9 @@ namespace SeatMod
         public override void OnUpdate()
         {
             if (Input.GetKeyDown(KeyCode.Alpha9)) //The '9' key on the top of the alphanumeric keyboard.
+            {
                 Unsit();
+            }
         }
 
         public void UiManagerInit()
@@ -144,21 +162,6 @@ namespace SeatMod
             var Transform = camera.GetIl2CppType().GetFields(Il2CppSystem.Reflection.BindingFlags.Public | Il2CppSystem.Reflection.BindingFlags.Instance).Where(f => f.FieldType == Il2CppType.Of<Transform>()).ToArray()[0];
             cameraTransform = Transform.GetValue(camera).Cast<Transform>();
             originalRotation = cameraTransform.localRotation;
-        }
-
-        public override void OnSceneWasLoaded(int buildIndex, string sceneName)
-        {
-            switch (buildIndex)
-            {
-                case -1:
-                    WorldType = 10;
-                    MelonCoroutines.Start(RiskFunct.CheckWorld());
-                    if (_vpalocal != null)
-                        _vpalocal = null;
-                    break;
-                default:
-                    break;
-            }
         }
 
         public static void Unsit()
