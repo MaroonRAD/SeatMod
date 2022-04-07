@@ -1,13 +1,14 @@
 # SeatMod
 
 
-SeatMod allows you to parent yourself to another player's head, or other bones in a variety of methods.  In order to sit on others you will need [*consent*](#Consent-and-Risky-Functions) from them.   
+SeatMod allows you to parent yourself to another player's head, or other bones in a variety of methods.  
 
 Note: All the movements are local to you and take time to be networked to others. If the person you are parented/sitting on isn't moving much, it will look fine. If they are running around it will be noticeable. 
 
 *Modding VRC is against their TOS and this mod visually and obviously does something that isn't possible with the native game. Only use around those you trust.*
 
 **Requires: [UIX](https://api.vrcmg.com/v0/mods/55/UIExpansionKit.dll)**  
+**Also requires: [VRCUK-Offline](https://github.com/MaroonRAD/Mods/releases)** or the original [VRCUK](https://github.com/SleepyVRC/Mods/releases)  
 **Supports: [AMAPI](https://api.vrcmg.com/v0/mods/201/ActionMenuApi.dll) (Highly recommended)**  
 
 * How to interact with this mod 
@@ -59,19 +60,11 @@ Why the different modes? Because I like making this overly complicated!
 ## Consent and Risky Functions
 _**Aka: Can this be used maliciously!?**_  
    
-SeatMod has a few safety checks in it
-* Consent
-	* SeatMod requires the target player to have a consent code/phrase in their Status or Bio.
-		* The following are the currently used consent codes. _(Not case sensitive)_
-			* The individual's private code
-			* "siton"
-			* "sit with me"
-			* "seats together"
-		* **Note: A user's Status updates much quicker then a user's Bio. If you want to use this mod immediately with someone, have them place one of the codes in their Status**
-  * If the user is on 'Do Not Distrub', or they have the phrase 'nosit' in their status, the mod will not allow you to parent to them.
+This version of SeatMod has safety checks using VRCUK rather than being integrated.
 * Risky Function Check
 	* Much like other mods that allow you to teleport or move in ways VRC did not intend, SeatMod implements a risky function check. 
-		* The mod can not be used in a Public/Friends+ instance that is a Game or Club world, or world is blacklisted in emmVRC's database or it has a blacklist GameObject in the world.
+		* This mod uses VRChatUtilityKit to check for risky functions. 
+		* Basically, you can't use this to gain an advantage in public games or anything like that
 
 ## Screenshots! 
 ### AMAPI Support 
